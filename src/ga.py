@@ -82,27 +82,47 @@ class Individual_Grid(object):
                         #genome[y][x] = random.choices(options[0:6], k=width)
                         printOption = options[randint(2, 6)]
                         genome[y][x] = printOption #options[randint(0, 6)]
-                        #print('Mutated genome[',y,'][',x,'] with',printOption)
+                        print('Mutated genome[',y,'][',x,'] with ',printOption)
+                
+                
                 
                 if(x+1 < right):
-                    # start a gap between 2 solid walls "X"
+                    # start a gap between 2 solid ground "X"
                     if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
                         if random.random() < .1:
                             genome[y][x+1] = "-"
+                    # get rid of pipes clipping into another pipe
+                    if (genome[y][x] == "|" or genome[y][x] == "T") and (genome[y][x+1] == "|" or genome[y][x+1] == "T"):
+                        genome[y][x] == "-"
+                        
+                    if(y+1 < height): # maybe move these
+                        # remove any rogue, floating pipes
+                        if genome[y][x] == "T" and (genome[y+1][x] != "|" or genome[y+1][x] != "X" or genome[y+1][x+1] != "X"):
+                            genome[y][x] = "-"
+                        if genome[y][x] == "|" and (genome[y+1][x] != "|" or genome[y+1][x] != "X" or genome[y+1][x+1] != "X"):
+                            genome[y][x] = "-"
                     
-                    if(y-1 > 0):   
-                        # start a pipe on solid wall "X"
-                        if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
+                    if(y-1 > 0):
+                        # pipe stuff      
+                        if genome[y][x] == "|" and genome[y-1][x] != "|" and genome[y-1][x] != "T":
+                            if random.random() < 0.3:
+                                # continue building a pipe above a "|"    
+                                genome[y-1][x] = "|"
+                            else:
+                                # finish the pipe with a "T"
+                                genome[y-1][x] = "T"
+                                
+                        # finish other taller pipes as well       
+                        if genome[y][x] == "|" and genome[y-1][x] != "T":
+                            genome[y-1][x] = "T"
+                                
+                        # start a pipe on solid ground "X"
+                        if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X" and genome[y-1][x+1] != "|":
                             if random.random() < .05:
-                                print('WE IN HERE')
                                 genome[y-1][x+1] = "|"
-                
-                if( y+1 <height): # maybe move these
-                    if genome[y][x] == "T" and (genome[y+1][x] != "|" or genome[y+1][x] != "X"):
-                        genome[y][x] = "-"
-                    if genome[y][x] == "|" and (genome[y+1][x] != "|" or genome[y+1][x] != "X"):
-                        genome[y][x] = "-"
-                #pass
+                                
+                # remove any rogue, floating pipes here?
+                        
         return genome
 
     # Create zero or more children from self and other
