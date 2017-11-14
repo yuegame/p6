@@ -67,11 +67,11 @@ class Individual_Grid(object):
         # STUDENT implement a mutation operator, also consider not mutating this individual
         # STUDENT also consider weighting the different tile types so it's not uniformly random
         # STUDENT consider putting more constraints on this to prevent pipes in the air, etc
-
+        new_genome=copy.deepcopy(genome)
         left = 1
         right = width - 1
         for y in range(height):
-            for x in range(left, right):
+            for x in range(left+1, right-1):
                 pass
         return genome
 
@@ -84,9 +84,10 @@ class Individual_Grid(object):
         right = width - 1
         for y in range(height):
             for x in range(left, right):
+                if random.random()>.5:
+                    new_genome = other.genome
                 # STUDENT Which one should you take?  Self, or other?  Why?
                 # STUDENT consider putting more constraints on this to prevent pipes in the air, etc
-                pass
         # do mutation; note we're returning a one-element tuple here
         return (Individual_Grid(new_genome),)
 
@@ -114,10 +115,25 @@ class Individual_Grid(object):
         # STUDENT also consider weighting the different tile types so it's not uniformly random
         g = [random.choices(options, k=width) for row in range(height)]
         g[15][:] = ["X"] * width
-        g[14][0] = "m"
-        g[7][-1] = "v"
-        g[8:14][-1] = ["f"] * 6
+        for i in range(0,14):
+            g[i][0]="-"
+        for i in range(0,15):
+            if i<8:
+                for j in range(0, width-1):
+                    if random.random()<.85:
+                        g[i][j]="-"
+            else:
+                for j in range(0, width-1):
+                    if random.random()<.6:
+                        g[i][j]="-"
+        g[7][-2] = "v"
+        for i in range(0,14):
+            if i<7:
+                g[i][-2]="-"
+            elif i>7:
+                g[i][-2] = "f"
         g[14:16][-1] = ["X", "X"]
+        g[14][0] = "m"
         return cls(g)
 
 
@@ -163,7 +179,7 @@ class Individual_DE(object):
             pathPercentage=0.5,
             emptyPercentage=0.6,
             linearity=-0.5,
-            solvability=2.0
+            solvability=1.0
         )
         penalties = 0
         # STUDENT For example, too many stairs are unaesthetic.  Let's penalize that
@@ -261,8 +277,8 @@ class Individual_DE(object):
 
     def generate_children(self, other):
         # STUDENT How does this work?  Explain it in your writeup.
-        pa = random.randint(0, len(self.genome) - 1)
-        pb = random.randint(0, len(other.genome) - 1)
+        pa = random.randint(0, len(self.genome) - 1) if len(self.genome) > 0 else 0
+        pb = random.randint(0, len(other.genome) - 1) if len(other.genome) > 0 else 0
         a_part = self.genome[:pa] if len(self.genome) > 0 else []
         b_part = other.genome[pb:] if len(other.genome) > 0 else []
         ga = a_part + b_part
@@ -347,6 +363,15 @@ def generate_successors(population):
     results = []
     # STUDENT Design and implement this
     # Hint: Call generate_children() on some individuals and fill up results.
+    for i in range(len(population)-1):
+
+        aParent=population[i].mutate(population[i])
+        bParent=population[i+1].mutate(population[i+1])
+
+        newChild=aParent.generate_children(bParent)
+        
+        results.append(newChild[0])
+
     return results
 
 
@@ -361,7 +386,7 @@ def ga():
     with mpool.Pool(processes=os.cpu_count()) as pool:
         init_time = time.time()
         # STUDENT (Optional) change population initialization
-        population = [Individual.random_individual() if random.random() < 0.9
+        population = [Individual.random_individual() if random.random() < 1.0
                       else Individual.empty_individual()
                       for _g in range(pop_limit)]
         # But leave this line alone; we have to reassign to population because we get a new population that has more cached stuff in it.
@@ -390,7 +415,7 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
-                if stop_condition:
+                if stop_condition or generation > 4:
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
