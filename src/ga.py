@@ -77,18 +77,19 @@ class Individual_Grid(object):
 
     # Create zero or more children from self and other
     def generate_children(self, other):
-        new_genome = copy.deepcopy(self.genome)
+        genome = copy.deepcopy(self.genome)
+        other_genome = copy.deepcopy(other.genome)
         # Leaving first and last columns alone...
         # do crossover with other
         left = 1
         right = width - 1
         for y in range(height):
-            for x in range(left, right):
-                if random.random()>.5:
-                    new_genome = other.genome
+            for x in range((int)(random.random()*right), right):
+                    genome[y][x]=other_genome[y][x]
                 # STUDENT Which one should you take?  Self, or other?  Why?
                 # STUDENT consider putting more constraints on this to prevent pipes in the air, etc
         # do mutation; note we're returning a one-element tuple here
+        new_genome=genome
         return (Individual_Grid(new_genome),)
 
     # Turn the genome into a level string (easy for this genome)
@@ -179,7 +180,7 @@ class Individual_DE(object):
             pathPercentage=0.5,
             emptyPercentage=0.6,
             linearity=-0.5,
-            solvability=1.0
+            solvability=3.0
         )
         penalties = 0
         # STUDENT For example, too many stairs are unaesthetic.  Let's penalize that
@@ -363,14 +364,16 @@ def generate_successors(population):
     results = []
     # STUDENT Design and implement this
     # Hint: Call generate_children() on some individuals and fill up results.
-    for i in range(len(population)-1):
 
-        aParent=population[i].mutate(population[i])
-        bParent=population[i+1].mutate(population[i+1])
+    sorted(population, key=lambda level: level.fitness())
 
-        newChild=aParent.generate_children(bParent)
-        
-        results.append(newChild[0])
+    for i in range(6): #elitist, strongest gets passed on without children
+        results.append(population[i])
+
+    for i in range((int)(len(population)/2)):
+        if random.random() < 1-(i*.005): #tournament, individuals get passed on with chance proportional to fitness
+            newChild=population[i].generate_children(population[i+1])
+            results.append(newChild[0])
 
     return results
 
@@ -415,7 +418,7 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
-                if stop_condition or generation > 4:
+                if stop_condition or generation > 3:
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
