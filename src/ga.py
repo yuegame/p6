@@ -7,6 +7,7 @@ import random
 import shutil
 import time
 import math
+from random import randint
 
 width = 200
 height = 16
@@ -18,9 +19,10 @@ options = [
     "M",  # a question mark block with a mushroom
     "B",  # a breakable block
     "o",  # a coin
+    "E",  # an enemy
     "|",  # a pipe segment
     "T",  # a pipe top
-    "E",  # an enemy
+    
     #"f",  # a flag, do not generate
     #"v",  # a flagpole, do not generate
     #"m"  # mario's start position, do not generate
@@ -71,8 +73,36 @@ class Individual_Grid(object):
         left = 1
         right = width - 1
         for y in range(height):
-            for x in range(left+1, right-1):
-                pass
+            for x in range(left, right):
+                #print('Y: ',y,'X: ',x,'genome: ',genome)
+                
+                # small chance to mutate something from nothing "-"
+                if genome[y][x] == "-":
+                    if random.random() < .005:
+                        #genome[y][x] = random.choices(options[0:6], k=width)
+                        printOption = options[randint(2, 6)]
+                        genome[y][x] = printOption #options[randint(0, 6)]
+                        #print('Mutated genome[',y,'][',x,'] with',printOption)
+                
+                if(x+1 < right):
+                    # start a gap between 2 solid walls "X"
+                    if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
+                        if random.random() < .1:
+                            genome[y][x+1] = "-"
+                    
+                    if(y-1 > 0):   
+                        # start a pipe on solid wall "X"
+                        if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
+                            if random.random() < .05:
+                                print('WE IN HERE')
+                                genome[y-1][x+1] = "|"
+                
+                if( y+1 <height): # maybe move these
+                    if genome[y][x] == "T" and (genome[y+1][x] != "|" or genome[y+1][x] != "X"):
+                        genome[y][x] = "-"
+                    if genome[y][x] == "|" and (genome[y+1][x] != "|" or genome[y+1][x] != "X"):
+                        genome[y][x] = "-"
+                #pass
         return genome
 
     # Create zero or more children from self and other
@@ -89,8 +119,10 @@ class Individual_Grid(object):
                 # STUDENT Which one should you take?  Self, or other?  Why?
                 # STUDENT consider putting more constraints on this to prevent pipes in the air, etc
         # do mutation; note we're returning a one-element tuple here
-        new_genome=genome
-        return (Individual_Grid(new_genome),)
+        #new_genome=genome
+        #return (Individual_Grid(new_genome),)
+        returnThisGenome = self.mutate(genome)
+        return (Individual_Grid(returnThisGenome),)
 
     # Turn the genome into a level string (easy for this genome)
     def to_level(self):
