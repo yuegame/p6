@@ -3,7 +3,12 @@ Ryan Jaime
 Ruihong Yu
 
 Individual_Grid
-
+	Our generate_successors function uses elitist selection by picking the strongest 
+and passing them on without reproducing/mutating and tournament selection by randomly 
+reproducing with less than half of the most fit members of the population, favoring 
+those with higher fitness. The elitist selection ensured that the fitness level will 
+definitely not decrease, while the roulette selection tried its best to make more fit 
+children.
 
 Individual_DE
 
@@ -30,3 +35,11 @@ has a 1/2 chance to shift left/right and a 1/2 chance to grow wider/narrower. St
 switch the direction they face. Platforms have a 1/4 chance to shift left/right, a 1/4 
 chance to get wider/narrower, a 1/4 chance to shift up/down, and a 1/4 chance to change 
 what they're made of. Enemies are ignored in the mutation process.
+
+Changes: Negative linearity is now more prioritized. Since the original mutate function doesn't 
+actually make any new DEs out of nothing, the mutate function has been changed to do that now. In 
+order to avoid the list of genomes from getting too long, the genome pops an element off before 
+adding a new random genome once the list gets to a certain length. This happens independent of 
+the shifting/changing done in the original mutate function, as the original required the list not 
+being empty. These changes caused the level to be more interesting, but cluttered up if it was 
+let run for too long.

@@ -353,6 +353,25 @@ class Individual_DE(object):
     def mutate(self, new_genome):
         # STUDENT How does this work?  Explain it in your writeup.
         # STUDENT consider putting more constraints on this, to prevent generating weird things
+        if random.random() < .075: #mutate can actually generate things
+                de_type=random.choice(["4_block","5_qblock","3_coin","7_pipe", "0_hole","6_stairs","1_platform","2_enemy"])
+                if de_type in ["4_block", "5_qblock"]:
+                    new_de = (random.randint(1, width - 2), de_type, random.randint(0, height - 1), random.choice([True, False]))
+                elif de_type ==  "3_coin":
+                    new_de = (random.randint(1, width - 2), de_type, random.randint(0, height - 1))
+                elif de_type == "7_pipe":
+                    new_de = (random.randint(1, width - 2), de_type, random.randint(2, height - 9))
+                elif de_type == "6_stairs":
+                    new_de = (random.randint(1, width - 2), de_type, random.randint(1, height - 4), random.choice([-1, 1]))
+                elif de_type == "0_hole":
+                    new_de = (random.randint(1, width - 2), de_type, random.randint(1, 4))
+                elif de_type == "1_platform":
+                    new_de = (random.randint(1, width - 2), de_type, random.randint(1, 8), random.randint(0, height - 1), random.choice(["?", "X", "B"]))
+                elif de_type == "2_enemy":
+                    new_de = (random.randint(1, width - 2), "2_enemy")
+                if len(new_genome)> 75:
+                    new_genome.pop()
+                heapq.heappush(new_genome, new_de)
         if random.random() < 0.1 and len(new_genome) > 0:
             to_change = random.randint(0, len(new_genome) - 1)
             de = new_genome[to_change]
@@ -426,7 +445,9 @@ class Individual_DE(object):
                 new_de = (x, de_type, w, y, madeof)
             elif de_type == "2_enemy":
                 pass
-            new_genome.pop(to_change)
+            
+            if random.random() < .01: #random chance to delete a block
+                new_genome.pop(to_change)
             heapq.heappush(new_genome, new_de)
         return new_genome
 
@@ -506,12 +527,13 @@ class Individual_DE(object):
             (random.randint(1, width - 2), "4_block", random.randint(0, height - 1), random.choice([True, False])),
             (random.randint(1, width - 2), "5_qblock", random.randint(0, height - 1), random.choice([True, False])),
             (random.randint(1, width - 2), "6_stairs", random.randint(1, height - 4), random.choice([-1, 1])),
-            (random.randint(1, width - 2), "7_pipe", random.randint(2, height - 4))
+            (random.randint(1, width - 2), "7_pipe", random.randint(2, height - 4)),
+             (random.randint(1, width - 2), "7_pipe", random.randint(2, height - 4))
         ]) for i in range(elt_count)]
         return Individual_DE(g)
 
 
-Individual = Individual_Grid
+Individual = Individual_DE
 
 
 def generate_successors(population):
@@ -519,16 +541,18 @@ def generate_successors(population):
     # STUDENT Design and implement this
     # Hint: Call generate_children() on some individuals and fill up results.
 
-    sorted(population, key=lambda level: level.fitness(),reverse=True)
+    poplist = sorted(population, key=lambda level: level.fitness(),reverse=True)
 
     for i in range(6): #elitist, strongest gets passed on without children
-        results.append(population[i])
+        results.append(poplist[i])
 
-    for i in range((int)(len(population)/2)):
+    for i in range((int)(len(poplist)/1.25)): # this takes about 80% of the population, not all will move on
         if random.random() < 1-(i*.005): #tournament, individuals get passed on with chance proportional to fitness
-            newChild=population[i].generate_children(population[i+1])
+            newChild=poplist[i].generate_children(poplist[i+1]) #make children with the one right below in fitness
             results.append(newChild[0])
 
+    
+    #this process takes about 60% of the population, including 5 strongest
     return results
 
 
@@ -543,7 +567,7 @@ def ga():
     with mpool.Pool(processes=os.cpu_count()) as pool:
         init_time = time.time()
         # STUDENT (Optional) change population initialization
-        population = [Individual.random_individual() if random.random() < 0.0
+        population = [Individual.random_individual() if random.random() < 1.0
                       else Individual.empty_individual()
                       for _g in range(pop_limit)]
         # But leave this line alone; we have to reassign to population because we get a new population that has more cached stuff in it.
@@ -572,7 +596,6 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
-
                 if stop_condition or generation > 10:
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
