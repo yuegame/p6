@@ -82,24 +82,29 @@ class Individual_Grid(object):
                         #genome[y][x] = random.choices(options[0:6], k=width)
                         printOption = options[randint(2, 6)]
                         genome[y][x] = printOption #options[randint(0, 6)]
-                        print('Mutated genome[',y,'][',x,'] with ',printOption)
+                        #print('Mutated genome[',y,'][',x,'] with ',printOption)
                 
-                
-                
-                if(x+1 < right):
+                if(x+2 < right):
                     # start a gap between 2 solid ground "X"
-                    if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
-                        if random.random() < .1:
-                            genome[y][x+1] = "-"
-                    # get rid of pipes clipping into another pipe
-                    if (genome[y][x] == "|" or genome[y][x] == "T") and (genome[y][x+1] == "|" or genome[y][x+1] == "T"):
-                        genome[y][x] == "-"
+                    
+                    #if genome[y][x] == "X" and genome[y][x+1] == "-" and genome[y][x+2] == "X":
+                    #    if random.random() < .2:
+                    #        genome[y][x+2] = "-"
+                    
+                    #if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
+                    #    if random.random() < .1:
+                    #        genome[y][x+1] = "-"
+                    
+                    # get rid of pipes clipping into anything TO the right
+                    if (genome[y][x] == "|" or genome[y][x] == "T"): # and (genome[y][x+1] == "|" or genome[y][x+1] == "T"):
+                        genome[y][x+1] == "-"
                         
                     if(y+1 < height): # maybe move these
                         # remove any rogue, floating pipes
-                        if genome[y][x] == "T" and (genome[y+1][x] != "|" or genome[y+1][x] != "X" or genome[y+1][x+1] != "X"):
+                        if genome[y][x] == "T" and genome[y+1][x] != "|" and genome[y+1][x] != "X" and genome[y+1][x+1] != "X":
                             genome[y][x] = "-"
-                        if genome[y][x] == "|" and (genome[y+1][x] != "|" or genome[y+1][x] != "X" or genome[y+1][x+1] != "X"):
+                            
+                        if genome[y][x] == "|" and genome[y+1][x] != "|" and genome[y+1][x] != "X" and genome[y+1][x+1] != "X":
                             genome[y][x] = "-"
                     
                     if(y-1 > 0):
@@ -110,18 +115,28 @@ class Individual_Grid(object):
                                 genome[y-1][x] = "|"
                             else:
                                 # finish the pipe with a "T"
-                                genome[y-1][x] = "T"
+                                1+1
+                                #print('FInShINg pIPe 60% oNE')
+                                #genome[y-1][x] = "T"
                                 
                         # finish other taller pipes as well       
-                        if genome[y][x] == "|" and genome[y-1][x] != "T":
+                        if genome[y][x] == "|" and genome[y-1][x] != "T" and genome[y-1][x] != "|":
                             genome[y-1][x] = "T"
                                 
                         # start a pipe on solid ground "X"
                         if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X" and genome[y-1][x+1] != "|":
                             if random.random() < .05:
                                 genome[y-1][x+1] = "|"
-                                
+                 
+                # put hat onq pipeq
+                if genome[y][x] == "|":
+                    #print('fAT tHe PIpe AT', y,' ', x)
+                    genome[y-1][x] = "T"
                 # remove any rogue, floating pipes here?
+                if(y+1 < height):
+                    if genome[y][x] == "|" or genome[y][x] == "T":
+                        if ((genome[y+1][x] != "|" and genome[y+1][x] != "X") or genome[y+1][x+1] != "X"):
+                                genome[y][x] = "-"
                         
         return genome
 
@@ -179,13 +194,18 @@ class Individual_Grid(object):
                 for j in range(0, width-1):
                     if random.random()<.6:
                         g[i][j]="-"
+        
         g[7][-2] = "v"
-        for i in range(0,14):
+        g[7][-1] = "-"
+        for i in range(0,15):
             if i<7:
+                g[i][-1]="-"
                 g[i][-2]="-"
             elif i>7:
+                g[i][-1] = "-"
                 g[i][-2] = "f"
-        g[14:16][-1] = ["X", "X"]
+        
+        #g[14:16][-1] = ["X", "X"]
         g[14][0] = "m"
         return cls(g)
 
