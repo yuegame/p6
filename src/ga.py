@@ -49,9 +49,9 @@ class Individual_Grid(object):
         coefficients = dict(
             meaningfulJumpVariance=0.5,
             negativeSpace=0.6,
-            pathPercentage=0.5,
-            emptyPercentage=0.4,
-            linearity=-0.7,
+            pathPercentage=0.7,
+            emptyPercentage=0.3,
+            linearity=-0.9,
             solvability=2.0
         )
         self._fitness = sum(map(lambda m: coefficients[m] * measurements[m],
@@ -80,6 +80,7 @@ class Individual_Grid(object):
                 #print('Y: ',y,'X: ',x,'genome: ',genome)
                 #if genome[y][x] == "|":
                     #genome[y-1][x] = "T"
+                
                 # small chance to mutate something from nothing "-"
                 if genome[y][x] == "-":
                     if random.random() < .006:
@@ -88,32 +89,51 @@ class Individual_Grid(object):
                         genome[y][x] = printOption #options[randint(0, 6)]
                         #print('Mutated genome[',y,'][',x,'] with ',printOption)
                         
-                # small chance to remove something 
+                # small chance to remove something, not a pipe or ground tho
                 if genome[y][x] != "|" and genome[y][x] != "T" and genome[y][x] != "X":
                     if random.random() < .005:
                         genome[y][x] = "-"
                 
-                # chance that a block will extend to the right, creating a platform
-                if(x+1 < right):
-                    if (genome[y][x] == "B" or genome[y][x] == "?" or genome[y][x] == "M")and genome[y][x+1] == "-":
-                        rando = random.random()
-                        if rando < .45:
-                            genome[y][x+1] = "B"
-                        if rando < .2:
-                            genome[y][x+1] = "?"
-                        if rando < .1:
-                            genome[y][x+1] = "M"    
-                
                 if(x+4 < right):
+                    # chance that a block will extend to the right, creating a platform
+                    rando = random.random()
+                    if (genome[y][x] == "B" or genome[y][x] == "?" or genome[y][x] == "M")and genome[y][x+1] == "-":
+                        if rando < .01:
+                            genome[y][x+1] = "M"
+                        elif rando < .1:
+                            genome[y][x+1] = "?"        
+                        elif rando < .45:
+                            genome[y][x+1] = "B"
+                        elif rando < .55:
+                            genome[y][x+1] = "X"
+                    if(y+1 < height):
+                        if genome[y][x] == "X" and genome[y+1][x] == "-":
+                            if rando < .02:
+                                genome[y][x+1] = "B"
+                            elif rando < .04:
+                                genome[y][x+1] = "X"
+         
                     # chance to generate "stairs"
                     if genome[y][x] == "X" and genome[y][x+1] == "X":
-                        if genome[y-1][x] == "X":
+                        # to get more verticality to stairs, chance to extend plateus       ---- => --X-
+                        #                                                                   -XX- => -XX-
+                        if genome[y][x+2] == "-" and genome[y][x-1] == "X":                     
+                            if random.random() < .4:
+                                genome[y-1][x+1] = "X"
+                        # to get more verticality to stairs and not a 'second ground level' X- => XX
+                        # it will more often build near other, higher ground                XX => XX
+                        elif genome[y-1][x] == "X":
                             if random.random() < .3:
-                                genome[y-1][x+1] = "X"
-                    #if genome[y][x] == "X" and genome[y][x+1] == "X":
-                        
+                                if random.random() < .6:
+                                    genome[y-1][x+1] = "X"
+                                else:
+                                    genome[y-1][x] = "X"
+                        # chance to start stairs
                         elif random.random() < .02:
+                            if random.random() <.7:
                                 genome[y-1][x+1] = "X"
+                            else:
+                                genome[y-1][x] = "X"
                 
                     # start a gap in the ground
                     if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
@@ -133,6 +153,7 @@ class Individual_Grid(object):
                     # get rid of pipes clipping into anything TO the top
                     if genome[y][x] == "T":
                         genome[y-1][x] = "-"
+                        genome[y-1][x+1] = "-"
                     
                     if(y-3 > 0):
                         # start a pipe above solid ground "X"
@@ -152,6 +173,7 @@ class Individual_Grid(object):
                                         genome[y-2][x+1] = "T"
                         
                 # remove any rogue, floating pipes here
+                randoo = random.random()
                 if(y+1 < height):
                     if genome[y][x] == "|": 
                         if (genome[y+1][x] != "|" and genome[y+1][x] != "X"): # or genome[y+1][x+1] != "X"):
@@ -166,18 +188,25 @@ class Individual_Grid(object):
                             genome[y][x] = "-"
                         if (genome[y+1][x] != "|" and genome[y+1][x] != "X"): # or genome[y+1][x+1] != "X"):
                             genome[y][x] = "-"
+                            
+                    if genome[y][x] == "?" or genome[y][x] == "M" or genome[y][x] == "B" and genome[y+1][x] == "X" :
+                        if randoo < .9:
+                            genome[y][x] = "-"
                 
-                # remove "?" and "M" blocks if they cant even be reached by mario
-                if(y > 13):
-                    if genome[y][x] == "?" or genome[y][x] == "M" or genome[y][x] == "B" :
-                        genome[y][x] = "-"
+                
+                # chance to remove "?" and "M" blocks if they cant even be reached by mario
+                #if(y > 13):
+                #if genome[y][x] == "?" or genome[y][x] == "M" or genome[y][x] == "B" and genome[y+1][x] == "X" :
+                #    if randoo < .9:
+                #        genome[y][x] = "-"
                 if(y > 14):
                     if genome[y][x] != "-" and genome[y][x] != "X" and genome[y][x] != "|" and genome[y][x] != "T":
                         genome[y][x] = "-"
-                # remove enemies spawned too close to mario
+                # chance to remove enemies spawned too close to mario
                 if(x < 4):
                     if genome[y][x] == "E":
-                        genome[y][x] = "-"
+                        if randoo < .9:
+                            genome[y][x] = "-"
                 
                 # remove blocks clipping into pipes        
                 if genome[y][x] == "|": # or genome[y][x] == "T":
