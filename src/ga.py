@@ -50,8 +50,8 @@ class Individual_Grid(object):
             meaningfulJumpVariance=0.5,
             negativeSpace=0.6,
             pathPercentage=0.5,
-            emptyPercentage=0.6,
-            linearity=-0.5,
+            emptyPercentage=0.4,
+            linearity=-0.7,
             solvability=2.0
         )
         self._fitness = sum(map(lambda m: coefficients[m] * measurements[m],
@@ -172,9 +172,15 @@ class Individual_Grid(object):
         # do crossover with other
         left = 1
         right = width - 1
-        for y in range(height):
-            for x in range((int)(random.random()*right), right):
-                    genome[y][x]=other_genome[y][x]
+        #for y in range(height):
+        #    for x in range((int)(random.random()*right), right):
+        #            genome[y][x]=other_genome[y][x]
+        pa = random.randint(1, len(self.genome) - 4) if len(self.genome) > 0 else 0 #does double-point crossover
+        pb = random.randint(pa, len(other.genome) - 1) if len(other.genome) > 0 else 0
+        a_part = self.genome[:pa] if len(self.genome) > 0 else []
+        b_part = other.genome[pa:pb] if len(other.genome) > 0 else []
+        c_part= self.genome[pb:] if len(self.genome) > 0 else []
+        genome= a_part+b_part+c_part
                 # STUDENT Which one should you take?  Self, or other?  Why?
                 # STUDENT consider putting more constraints on this to prevent pipes in the air, etc
         # do mutation; note we're returning a one-element tuple here
@@ -271,12 +277,12 @@ class Individual_DE(object):
         # STUDENT Add more metrics?
         # STUDENT Improve this with any code you like
         coefficients = dict(
-            meaningfulJumpVariance=0.5,
-            negativeSpace=0.6,
+            meaningfulJumpVariance=0.7,
+            negativeSpace=0.8,
             pathPercentage=0.5,
             emptyPercentage=0.6,
-            linearity=-0.5,
-            solvability=3.0
+            linearity=-4.75,
+            solvability=4.0
         )
         penalties = 0
         # STUDENT For example, too many stairs are unaesthetic.  Let's penalize that
@@ -514,7 +520,11 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
+<<<<<<< HEAD
                 if stop_condition or generation > 4:
+=======
+                if stop_condition or generation > 10:
+>>>>>>> 06509ee0130059aa0d669e3db988c79a03f134a6
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
