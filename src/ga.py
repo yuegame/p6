@@ -84,18 +84,29 @@ class Individual_Grid(object):
                         printOption = options[randint(2, 6)]
                         genome[y][x] = printOption #options[randint(0, 6)]
                         #print('Mutated genome[',y,'][',x,'] with ',printOption)
+                if(x+1 < right):
+                    if genome[y][x] == "B" and genome[y][x+1] == "-":
+                        if random.random() < .5:
+                            genome[y][x+1] = "B"
                 
-                if(x+2 < right):
+                
+                if(x+4 < right):
                     # start a gap between 2 solid ground "X"
                     
                     #if genome[y][x] == "X" and genome[y][x+1] == "-" and genome[y][x+2] == "X":
                     #    if random.random() < .2:
                     #        genome[y][x+2] = "-"
                     
-                    #if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
-                    #    if random.random() < .1:
-                    #        genome[y][x+1] = "-"
-                    
+                    if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
+                        if genome[y-1][x] != "|" and genome[y-1][x+1] != "|" and genome[y-1][x+2] != "|":
+                            if random.random() < .02:
+                                genome[y][x+1] = "-"
+                                if random.random() < .3:
+                                    genome[y][x+2] = "-"
+                                    if random.random() < .3:
+                                        genome[y][x+3] = "-"
+                                        if random.random() < .3:
+                                            genome[y][x+4] = "-"
                     # get rid of pipes clipping into anything TO the right
                     if (genome[y][x] == "|" or genome[y][x] == "T"): # and (genome[y][x+1] == "|" or genome[y][x+1] == "T"):
                         genome[y][x+1] == "-"
