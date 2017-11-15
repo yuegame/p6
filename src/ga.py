@@ -99,33 +99,8 @@ class Individual_Grid(object):
                     # get rid of pipes clipping into anything TO the right
                     if (genome[y][x] == "|" or genome[y][x] == "T"): # and (genome[y][x+1] == "|" or genome[y][x+1] == "T"):
                         genome[y][x+1] == "-"
-                        
-                    if(y+1 < height): # maybe move these
-                        # remove any rogue, floating pipes
-                        1+1
-                        '''
-                        if genome[y][x] == "T" and genome[y+1][x] != "|" and genome[y+1][x] != "X" and genome[y+1][x+1] != "X":
-                            genome[y][x] = "-"
-                            
-                        if genome[y][x] == "|" and genome[y+1][x] != "|" and genome[y+1][x] != "X" and genome[y+1][x+1] != "X":
-                            genome[y][x] = "-"
-                        '''
+                    
                     if(y-3 > 0):
-                        # pipe stuff      
-                        #if genome[y][x] == "|" and genome[y-1][x] != "|" and genome[y-1][x] != "T":
-                            #if random.random() < 0.3:
-                                # continue building a pipe above a "|"    
-                                #genome[y-1][x] = "|"
-                                #genome[y-2][x] = "T"
-                            #else:
-                                # finish the pipe with a "T"
-                                #1+1
-                                #print('FInShINg pIPe 60% oNE')
-                                #genome[y-1][x] = "T"
-                                
-                        # finish other taller pipes as well       
-                        #if genome[y][x] == "|" and genome[y-1][x] != "T" and genome[y-1][x] != "|":
-                            #genome[y-1][x] = "T"
                                 
                         # start a pipe above solid ground "X"
                         if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X" and genome[y-1][x+1] != "|":
@@ -133,7 +108,7 @@ class Individual_Grid(object):
                                 if random.random() < .05:
                                     genome[y-1][x+1] = "|"
                                     if random.random() < 0.3:
-                                        # continue building a pipe above a "|"    
+                                        # continue building a pipe  
                                         genome[y-2][x+1] = "|"
                                         if random.random() < 0.3:
                                             genome[y-3][x+1] = "|"
@@ -156,12 +131,7 @@ class Individual_Grid(object):
                             genome[y][x] = "-"
                         if (genome[y+1][x] != "|" and genome[y+1][x] != "X"): # or genome[y+1][x+1] != "X"):
                             genome[y][x] = "-"
-                            print('DELETEd at ',y,' ',x)
-                # put hat onq pipeq
-                #if genome[y][x] == "|":
-                    #genome[y-1][x] = "T"
-                    #genome[y-2][x-1] = "T"
-                    #print('fAT tHe PIpe AT', y-1,' ', x)        
+                            
         return genome
 
     # Create zero or more children from self and other
@@ -520,11 +490,9 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
-<<<<<<< HEAD
-                if stop_condition or generation > 4:
-=======
+
                 if stop_condition or generation > 10:
->>>>>>> 06509ee0130059aa0d669e3db988c79a03f134a6
+
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
