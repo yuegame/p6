@@ -325,7 +325,7 @@ class Individual_DE(object):
                     x = offset_by_upto(x, width / 8, min=1, max=width - 2)
                 elif choice < 0.66:
                     y = offset_by_upto(y, height / 2, min=0, max=height - 1)
-                else:
+                if choice < .5:
                     has_powerup = not de[3]
                 new_de = (x, de_type, y, has_powerup)
             elif de_type == "3_coin":
@@ -467,7 +467,7 @@ def generate_successors(population):
     # STUDENT Design and implement this
     # Hint: Call generate_children() on some individuals and fill up results.
 
-    sorted(population, key=lambda level: level.fitness())
+    sorted(population, key=lambda level: level.fitness(), reverse=True)
 
     for i in range(6): #elitist, strongest gets passed on without children
         results.append(population[i])
@@ -520,11 +520,8 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
-<<<<<<< HEAD
-                if stop_condition or generation > 4:
-=======
+
                 if stop_condition or generation > 10:
->>>>>>> 06509ee0130059aa0d669e3db988c79a03f134a6
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
