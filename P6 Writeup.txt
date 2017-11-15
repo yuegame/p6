@@ -1,0 +1,32 @@
+P6 Writeup
+Ryan Jaime
+Ruihong Yu
+
+Individual_Grid
+
+
+Individual_DE
+
+	The Individual_DE's crossover uses a strange single-point crossover, creating two 
+children made with the parts of both parents chosen by two random points. The first child has 
+the front part of the first parent up to the first point and the back part of second parent 
+starting from the second point, while the second child has the front part of the second 
+parent up to the second point and the back part of the first parent starting from the first point.
+
+Crossover points of 4 and 7
+1234567890 Parent A
+0987654321 Parent B
+
+1234321 Child A
+0987654567890 Child B
+
+	The mutation function mutates blocks into different things or shifts them based on what they 
+originally were. A block has a 1/3 chance to shift left/right, 1/3 chance to shift up/down, 
+and a 1/3 chance to become breakable/unbreakable. A question block has 1/3 chance to shift 
+left/right, 1/3 chance to shift up/down, and a 1/3 chance to gain/lose a powerup. Coins and 
+pipes just have a 1/2 chance to shift left/right and a 1/2 chance to shift up/down. A hole 
+has a 1/2 chance to shift left/right and a 1/2 chance to grow wider/narrower. Stairs have a 
+1/3 chance to shift left/right, a 1/3 chance to get taller/shorter, and a 1/3 chance to 
+switch the direction they face. Platforms have a 1/4 chance to shift left/right, a 1/4 
+chance to get wider/narrower, a 1/4 chance to shift up/down, and a 1/4 chance to change 
+what they're made of. Enemies are ignored in the mutation process.
