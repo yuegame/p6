@@ -10,6 +10,67 @@ those with higher fitness. The elitist selection ensured that the fitness level 
 definitely not decrease, while the roulette selection tried its best to make more fit 
 children.
 
+The mutation function has:
+A small chance of creating something other than pipe pieces 
+and solid walls from an empty space. (0.6% for each empty space)
+
+A small chance of removing something other than pipe pieces 
+and solid walls, replacing with empty space. (0.5% for each qualifying option)
+
+A chance that a block (B,?, or M) will extend to the right, creating a platform
+as long as the area to the right is empty.
+(1% to add a Mushroom block)
+(9% to add a Question block)
+(35% to add a Breakable block)
+(10% to add a solid block)
+
+A chance that a 'floating' solid block will extend to the right, creating a platform
+as long as the area to the right is empty.
+(2% to add a Breakable block)
+(2% to add a solid block)
+
+A chance to generate 'stairs' when there are two solid blocks side by side horizontally
+To get more verticality and avoid creating a second layer of solid ground:
+ ---- => --X- higher chance to add a stair when the adjacent blocks are also 
+ -XX-    -XX- surrounded by empty spaces (40% to add a solid block)
+
+  X-  =>  XX  higher chance to build near other, higher ground
+  XX      XX  (30% to add a solid block)
+ 
+  --  => -X   small chance to begin 'stairs' (2% for every pair of horizontally adjacent solid blocks)
+  XX  => XX   (70% stairs will lead to upper right, 30% they will lead to upper left)
+ 
+A chance to start a gap in the solid ground as long as the ground is not supporting pipes
+ --- => ---   (2% to add a gap in the middle of three horizontally adjacent solid blocks)
+ XXX    X-X (3% chance the gap will extend to the right by one)
+   
+Gets rid of objects that clip into pipes
+ TB  => T-    replaces spaces to the right of pipes with empty space
+ |o     |-
+ 
+ B?  => --  replaces spaces above the pipe with empty spaces
+ T-     T- 
+ 
+A chance to create a pipe above solid ground, as long as it wont collide with other existing pipes
+ ---    -T-  (2% for each three horizontally adjacent solid blocks)
+ --- => -|-  (50% chance the pipe will be one "|" taller)
+ XXX    XXX  (70% chance this taller pipe will get even taller)
+
+If there happens to be any rogue, floating pipe pieces, it will remove them
+
+90% chance to remove Question and Mushroom blocks if they are blocked by solid ground
+ ?-M => ---
+ XXX    XXX
+
+30% chance to remove Question and Mushroom blocks if they are blocked by Breakable blocks
+ ?-M => ---
+ BBB    BBB
+ 
+75% chance to remove enemies if they are spawned within 3 cols of mario's spawn
+
+A very small chacne to not mutate the individual at all.
+
+
 Individual_DE
 
 	The Individual_DE's crossover uses a strange single-point crossover, creating two 
