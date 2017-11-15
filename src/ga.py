@@ -75,7 +75,8 @@ class Individual_Grid(object):
         for y in range(height):
             for x in range(left, right):
                 #print('Y: ',y,'X: ',x,'genome: ',genome)
-                
+                #if genome[y][x] == "|":
+                    #genome[y-1][x] = "T"
                 # small chance to mutate something from nothing "-"
                 if genome[y][x] == "-":
                     if random.random() < .005:
@@ -101,43 +102,66 @@ class Individual_Grid(object):
                         
                     if(y+1 < height): # maybe move these
                         # remove any rogue, floating pipes
+                        1+1
+                        '''
                         if genome[y][x] == "T" and genome[y+1][x] != "|" and genome[y+1][x] != "X" and genome[y+1][x+1] != "X":
                             genome[y][x] = "-"
                             
                         if genome[y][x] == "|" and genome[y+1][x] != "|" and genome[y+1][x] != "X" and genome[y+1][x+1] != "X":
                             genome[y][x] = "-"
-                    
-                    if(y-1 > 0):
+                        '''
+                    if(y-3 > 0):
                         # pipe stuff      
-                        if genome[y][x] == "|" and genome[y-1][x] != "|" and genome[y-1][x] != "T":
-                            if random.random() < 0.3:
+                        #if genome[y][x] == "|" and genome[y-1][x] != "|" and genome[y-1][x] != "T":
+                            #if random.random() < 0.3:
                                 # continue building a pipe above a "|"    
-                                genome[y-1][x] = "|"
-                            else:
+                                #genome[y-1][x] = "|"
+                                #genome[y-2][x] = "T"
+                            #else:
                                 # finish the pipe with a "T"
-                                1+1
+                                #1+1
                                 #print('FInShINg pIPe 60% oNE')
                                 #genome[y-1][x] = "T"
                                 
                         # finish other taller pipes as well       
-                        if genome[y][x] == "|" and genome[y-1][x] != "T" and genome[y-1][x] != "|":
-                            genome[y-1][x] = "T"
+                        #if genome[y][x] == "|" and genome[y-1][x] != "T" and genome[y-1][x] != "|":
+                            #genome[y-1][x] = "T"
                                 
-                        # start a pipe on solid ground "X"
+                        # start a pipe above solid ground "X"
                         if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X" and genome[y-1][x+1] != "|":
-                            if random.random() < .05:
-                                genome[y-1][x+1] = "|"
-                 
-                # put hat onq pipeq
-                if genome[y][x] == "|":
-                    #print('fAT tHe PIpe AT', y,' ', x)
-                    genome[y-1][x] = "T"
-                # remove any rogue, floating pipes here?
+                            if genome[y-1][x] != "|" and genome[y-1][x] != "T" and genome[y-1][x+2] != "|" and genome[y-1][x+2] != "T":
+                                if random.random() < .05:
+                                    genome[y-1][x+1] = "|"
+                                    if random.random() < 0.3:
+                                        # continue building a pipe above a "|"    
+                                        genome[y-2][x+1] = "|"
+                                        if random.random() < 0.3:
+                                            genome[y-3][x+1] = "|"
+                                            genome[y-4][x+1] = "T"
+                                        else:
+                                            genome[y-3][x+1] = "T"
+                                    else:
+                                        genome[y-2][x+1] = "T"
+             
+                # remove any rogue, floating pipes here
                 if(y+1 < height):
-                    if genome[y][x] == "|" or genome[y][x] == "T":
+                    if genome[y][x] == "|": 
                         if ((genome[y+1][x] != "|" and genome[y+1][x] != "X") or genome[y+1][x+1] != "X"):
                                 genome[y][x] = "-"
-                        
+                        if ((genome[y-1][x] != "|" and genome[y-1][x] != "T")):
+                                genome[y][x] = "-"
+                                
+                    if genome[y][x] == "T":
+                        if (genome[y+1] == "X" and genome[y+1][x+1] != "X"):
+                            genome[y][x] = "-"
+                        if (genome[y+1][x] != "|" and genome[y+1][x] != "X"): # or genome[y+1][x+1] != "X"):
+                            genome[y][x] = "-"
+                            print('DELETEd at ',y,' ',x)
+                # put hat onq pipeq
+                #if genome[y][x] == "|":
+                    #genome[y-1][x] = "T"
+                    #genome[y-2][x-1] = "T"
+                    #print('fAT tHe PIpe AT', y-1,' ', x)        
         return genome
 
     # Create zero or more children from self and other
@@ -461,7 +485,7 @@ def ga():
     with mpool.Pool(processes=os.cpu_count()) as pool:
         init_time = time.time()
         # STUDENT (Optional) change population initialization
-        population = [Individual.random_individual() if random.random() < 1.0
+        population = [Individual.random_individual() if random.random() < 0.0
                       else Individual.empty_individual()
                       for _g in range(pop_limit)]
         # But leave this line alone; we have to reassign to population because we get a new population that has more cached stuff in it.
@@ -490,7 +514,7 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
-                if stop_condition or generation > 3:
+                if stop_condition or generation > 4:
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
