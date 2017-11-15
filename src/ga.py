@@ -247,12 +247,12 @@ class Individual_DE(object):
         # STUDENT Add more metrics?
         # STUDENT Improve this with any code you like
         coefficients = dict(
-            meaningfulJumpVariance=0.5,
-            negativeSpace=0.6,
+            meaningfulJumpVariance=0.7,
+            negativeSpace=0.8,
             pathPercentage=0.5,
             emptyPercentage=0.6,
-            linearity=-0.5,
-            solvability=3.0
+            linearity=-4.75,
+            solvability=4.0
         )
         penalties = 0
         # STUDENT For example, too many stairs are unaesthetic.  Let's penalize that
@@ -429,7 +429,7 @@ class Individual_DE(object):
         return Individual_DE(g)
 
 
-Individual = Individual_Grid
+Individual = Individual_DE
 
 
 def generate_successors(population):
@@ -490,7 +490,7 @@ def ga():
                 generation += 1
                 # STUDENT Determine stopping condition
                 stop_condition = False
-                if stop_condition or generation > 3:
+                if stop_condition or generation > 10:
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
