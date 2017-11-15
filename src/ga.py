@@ -70,6 +70,9 @@ class Individual_Grid(object):
         # STUDENT also consider weighting the different tile types so it's not uniformly random
         # STUDENT consider putting more constraints on this to prevent pipes in the air, etc
         new_genome=copy.deepcopy(genome)
+        # consider not mutating this individual
+        if random.random() < .00001:
+            return new_genome
         left = 1
         right = width - 1
         for y in range(height):
@@ -81,22 +84,18 @@ class Individual_Grid(object):
                 if genome[y][x] == "-":
                     if random.random() < .005:
                         #genome[y][x] = random.choices(options[0:6], k=width)
-                        printOption = options[randint(2, 6)]
+                        printOption = options[randint(3, 6)]
                         genome[y][x] = printOption #options[randint(0, 6)]
                         #print('Mutated genome[',y,'][',x,'] with ',printOption)
                 if(x+1 < right):
                     if genome[y][x] == "B" and genome[y][x+1] == "-":
-                        if random.random() < .5:
+                        if random.random() < .55:
                             genome[y][x+1] = "B"
-                
+                        else:
+                            genome[y][x] = options[randint(3, 6)]
                 
                 if(x+4 < right):
-                    # start a gap between 2 solid ground "X"
-                    
-                    #if genome[y][x] == "X" and genome[y][x+1] == "-" and genome[y][x+2] == "X":
-                    #    if random.random() < .2:
-                    #        genome[y][x+2] = "-"
-                    
+                    # start a gap in the ground
                     if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X":
                         if genome[y-1][x] != "|" and genome[y-1][x+1] != "|" and genome[y-1][x+2] != "|":
                             if random.random() < .02:
@@ -107,12 +106,15 @@ class Individual_Grid(object):
                                         genome[y][x+3] = "-"
                                         if random.random() < .3:
                                             genome[y][x+4] = "-"
+                                            
                     # get rid of pipes clipping into anything TO the right
                     if (genome[y][x] == "|" or genome[y][x] == "T"): # and (genome[y][x+1] == "|" or genome[y][x+1] == "T"):
                         genome[y][x+1] == "-"
+                    # get rid of pipes clipping into anything TO the top
+                    if genome[y][x] == "T":
+                        genome[y-1][x] = "-"
                     
                     if(y-3 > 0):
-                                
                         # start a pipe above solid ground "X"
                         if genome[y][x] == "X" and genome[y][x+1] == "X" and genome[y][x+2] == "X" and genome[y-1][x+1] != "|":
                             if genome[y-1][x] != "|" and genome[y-1][x] != "T" and genome[y-1][x+2] != "|" and genome[y-1][x+2] != "T":
@@ -128,20 +130,56 @@ class Individual_Grid(object):
                                             genome[y-3][x+1] = "T"
                                     else:
                                         genome[y-2][x+1] = "T"
+                        # start a pipe in a hole "-"
+                        if(y>14):
+                            if genome[y][x] == "-" and genome[y][x+1] == "-" and genome[y-1][x+1] != "|":
+                                if genome[y-1][x] != "|" and genome[y-1][x] != "T":
+                                    if random.random() < .05:
+                                        genome[y][x] = "|"
+                                        #genome[y-1][x] = "T"
+                                        if random.random() < 0.3:
+                                            # continue building a pipe  
+                                            genome[y-1][x] = "|"
+                                            #genome[y-2][x] = "T"
+                                            if random.random() < 0.4:
+                                                genome[y-2][x] = "|"
+                                                #genome[y-3][x] = "T"
+                                                if random.random() < 0.5:
+                                                    genome[y-3][x] = "|"
+                                                    genome[y-4][x] = "T"
+                                                else:
+                                                    genome[y-3][x] = "T"    
+                                            else:
+                                                genome[y-2][x] = "T"
+                                        else:
+                                            genome[y-1][x] = "T"
              
                 # remove any rogue, floating pipes here
                 if(y+1 < height):
                     if genome[y][x] == "|": 
-                        if ((genome[y+1][x] != "|" and genome[y+1][x] != "X") or genome[y+1][x+1] != "X"):
+                        if (genome[y+1][x] != "|" and genome[y+1][x] != "X"): # or genome[y+1][x+1] != "X"):
                                 genome[y][x] = "-"
                         if ((genome[y-1][x] != "|" and genome[y-1][x] != "T")):
                                 genome[y][x] = "-"
                                 
                     if genome[y][x] == "T":
-                        if (genome[y+1] == "X" and genome[y+1][x+1] != "X"):
+                        #if genome[y+1][x]
+                        if (genome[y+1][x] == "X" and genome[y+1][x+1] == "-"):
                             genome[y][x] = "-"
                         if (genome[y+1][x] != "|" and genome[y+1][x] != "X"): # or genome[y+1][x+1] != "X"):
                             genome[y][x] = "-"
+                # remove "?" and "M" blocks if they cant even be reached by mario
+                if(y > 13):
+                    if genome[y][x] == "?" or genome[y][x] == "M" or genome[y][x] == "B" :
+                        genome[y][x] = "-"
+                if(y > 14):
+                    if genome[y][x] != "-" and genome[y][x] != "X" and genome[y][x] != "|" and genome[y][x] != "T":
+                        genome[y][x] = "-"
+                # remove blocks clipping into pipes        
+                if genome[y][x] == "|": # or genome[y][x] == "T":
+                    genome[y][x+1] = "-"
+                if genome[y][x] == "T": # or genome[y][x] == "T":
+                    genome[y][x+1] = "-"                     
                             
         return genome
 
@@ -448,7 +486,7 @@ def generate_successors(population):
     # STUDENT Design and implement this
     # Hint: Call generate_children() on some individuals and fill up results.
 
-    sorted(population, key=lambda level: level.fitness())
+    sorted(population, key=lambda level: level.fitness(),reverse=True)
 
     for i in range(6): #elitist, strongest gets passed on without children
         results.append(population[i])
@@ -502,8 +540,7 @@ def ga():
                 # STUDENT Determine stopping condition
                 stop_condition = False
 
-                if stop_condition or generation > 10:
-
+                if stop_condition or generation > 40:
                     break
                 # STUDENT Also consider using FI-2POP as in the Sorenson & Pasquier paper
                 gentime = time.time()
