@@ -48,7 +48,7 @@ class Individual_Grid(object):
         # STUDENT Modify this, and possibly add more metrics.  You can replace this with whatever code you like.
         coefficients = dict(
             meaningfulJumpVariance=0.5,
-            negativeSpace=0.6,
+            negativeSpace=3.0,
             pathPercentage=0.7,
             emptyPercentage=0.3,
             linearity=-0.9,
@@ -90,29 +90,69 @@ class Individual_Grid(object):
                         #print('Mutated genome[',y,'][',x,'] with ',printOption)
                         
                 # small chance to remove something, not a pipe or ground tho
-                if genome[y][x] != "|" and genome[y][x] != "T" and genome[y][x] != "X":
-                    if random.random() < .005:
+                #if genome[y][x] != "|" and genome[y][x] != "T" and genome[y][x] != "X":
+                if genome[y][x] == "B": 
+                    if random.random() <.17:
+                        genome[y][x] = "-"
+                elif genome[y][x] == "M":
+                     if random.random() <.25:
+                        genome[y][x] = "-"
+                elif genome[y][x] == "o":
+                    if random.random() <.001:
+                        genome[y][x] = "-"
+                elif genome[y][x] == "E":
+                    if random.random() < .09: #.005
+                        genome[y][x] = "-"
+                elif genome[y][x] == "?": 
+                    if random.random() < .15:
                         genome[y][x] = "-"
                 
                 if(x+4 < right):
                     # chance that a block will extend to the right, creating a platform
                     rando = random.random()
                     if (genome[y][x] == "B" or genome[y][x] == "?" or genome[y][x] == "M")and genome[y][x+1] == "-":
-                        if rando < .01:
+                        if random.random() < .01:
                             genome[y][x+1] = "M"
-                        elif rando < .1:
-                            genome[y][x+1] = "?"        
-                        elif rando < .45:
-                            genome[y][x+1] = "B"
-                        elif rando < .55:
+                            
+                        elif random.random() < .1:
+                            #print("?")
+                            genome[y][x+1] = "?"     
+                            
+                        elif random.random() < .35:
+                            genome[y][x+1] = "B" #??? was B
+                            
+                        elif random.random() < .40:
                             genome[y][x+1] = "X"
+                    
                     if(y+1 < height):
+                        # small chance to extend floating solid blocks
                         if genome[y][x] == "X" and genome[y+1][x] == "-":
                             if rando < .02:
-                                genome[y][x+1] = "B"
-                            elif rando < .04:
+                                genome[y][x+1] = "B" #??????????? was B
+                            elif rando < .03:
+                                genome[y][x+1] = "?"
+                            elif rando < .2:
                                 genome[y][x+1] = "X"
-         
+                                
+                        
+                        # chance to remove isolated solid blocks
+                        if genome[y][x] == "X":
+                            if genome[y+1][x-1] == "-" and genome[y+1][x] == "-" and genome[y+1][x+1] == "-" and genome[y][x-1] == "-" and genome[y][x+1] == "-":
+                                if random.random() < .6:
+                                    genome[y][x] = "-"
+                            elif genome[y+1][x-1] == "-" and genome[y+1][x] == "-" and genome[y+1][x+1] == "-":
+                                if random.random() < .4:
+                                    genome[y][x] = "-"
+                                    
+                        # chance to remove enemies spawned too close to each other
+                        if genome[y][x] == "E":
+                            if genome[y+1][x-1] == "E" or genome[y+1][x] == "E" or genome[y+1][x+1] == "E" or genome[y][x-1] == "E" or genome[y][x+1] == "E" or genome[y-1][x-1] == "E" or genome[y-1][x] == "E" or genome[y-1][x+1] == "E":
+                                if random.random() < .9:
+                                    genome[y][x] = "-"
+                            #elif genome[y+1][x-1] == "E" and genome[y+1][x] == "E" and genome[y+1][x+1] == "E":
+                            #    if random.random() < .4:
+                            #        genome[y][x] = "-"
+                                    
                     # chance to generate "stairs"
                     if genome[y][x] == "X" and genome[y][x+1] == "X":
                         # to get more verticality to stairs, chance to extend plateus       ---- => --X-
@@ -122,12 +162,12 @@ class Individual_Grid(object):
                                 genome[y-1][x+1] = "X"
                         # to get more verticality to stairs and not a 'second ground level' X- => XX
                         # it will more often build near other, higher ground                XX => XX
-                        elif genome[y-1][x] == "X":
+                        elif genome[y-1][x] == "X" and genome[y-1][x+1] == "-":
                             if random.random() < .3:
-                                if random.random() < .6:
-                                    genome[y-1][x+1] = "X"
-                                else:
-                                    genome[y-1][x] = "X"
+                                #if random.random() < .6:
+                                genome[y-1][x+1] = "X"
+                                #else:
+                                 #   genome[y-1][x] = "X"
                         # chance to start stairs
                         elif random.random() < .02:
                             if random.random() <.7:
@@ -147,10 +187,10 @@ class Individual_Grid(object):
                                         if random.random() < .3:
                                             genome[y][x+4] = "-"
                                             
-                    # get rid of pipes clipping into anything TO the right
+                    # get rid of things clipping into pipes, on the right of the pipes
                     if (genome[y][x] == "|" or genome[y][x] == "T"): # and (genome[y][x+1] == "|" or genome[y][x+1] == "T"):
                         genome[y][x+1] == "-"
-                    # get rid of pipes clipping into anything TO the top
+                    # get rid of anything clipping into pipes, above the pipes
                     if genome[y][x] == "T":
                         genome[y-1][x] = "-"
                         genome[y-1][x+1] = "-"
@@ -188,24 +228,28 @@ class Individual_Grid(object):
                             genome[y][x] = "-"
                         if (genome[y+1][x] != "|" and genome[y+1][x] != "X"): # or genome[y+1][x+1] != "X"):
                             genome[y][x] = "-"
-                            
-                    if genome[y][x] == "?" or genome[y][x] == "M" or genome[y][x] == "B" and genome[y+1][x] == "X" :
+                    '''
+                    # chance to remove "?" and "M" blocks if they cant even be reached by mario        
+                    if (genome[y][x] == "?" or genome[y][x] == "M") and genome[y+1][x] == "X" :
                         if randoo < .9:
                             genome[y][x] = "-"
-                
-                
-                # chance to remove "?" and "M" blocks if they cant even be reached by mario
-                #if(y > 13):
-                #if genome[y][x] == "?" or genome[y][x] == "M" or genome[y][x] == "B" and genome[y+1][x] == "X" :
-                #    if randoo < .9:
-                #        genome[y][x] = "-"
+                    
+                    if genome[y][x] == "?" or genome[y][x] == "M":
+                        if genome[y+1][x] == "X":
+                            if randoo < .9:
+                                genome[y][x] = "-"
+                        elif genome[y+1][x] == "B":
+                            if randoo < .3:
+                                genome[y][x] = "-"
+                    '''
+               
                 if(y > 14):
                     if genome[y][x] != "-" and genome[y][x] != "X" and genome[y][x] != "|" and genome[y][x] != "T":
                         genome[y][x] = "-"
                 # chance to remove enemies spawned too close to mario
                 if(x < 4):
                     if genome[y][x] == "E":
-                        if randoo < .9:
+                        if randoo < .75:
                             genome[y][x] = "-"
                 
                 # remove blocks clipping into pipes        
@@ -533,7 +577,8 @@ class Individual_DE(object):
         return Individual_DE(g)
 
 
-Individual = Individual_DE
+#Individual = Individual_DE
+Individual = Individual_Grid
 
 
 def generate_successors(population):
