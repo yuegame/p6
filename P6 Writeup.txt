@@ -24,7 +24,7 @@ as long as the area to the right is empty.
 (1% to add a Mushroom block)
 (9% to add a Question block)
 (35% to add a Breakable block)
-(10% to add a solid block)
+(5% to add a solid block)
 
 A chance that a 'floating' solid block will extend to the right, creating a platform
 as long as the area to the right is empty.
@@ -111,3 +111,9 @@ Levels
 1000HoursWork.txt
 I like this level because Mario can explore a large portion of the stage, including the air. This 
 took 10 generations and 110 seconds to generate.
+
+20HoursWork.txt
+I like how the ? blocks embedded in the solid X's look in the first third of the level.
+There are some nice tall pipes and cool stairs as well.
+I like how the powerup blocks are sparse and happen to be towards the top of the level.
+This took 10 generations and 82 seconds to generate.
